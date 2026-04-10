@@ -1,8 +1,8 @@
 import jwt from "jsonwebtoken";
-// ter naa ki
+
 export const requireAuth = (req, res, next) => {
-  const auth = req.headers.authorization || "";
-  const token = auth.startsWith("Bearer ") ? auth.slice(7) : null;
+  const authHeader = req.headers.authorization || "";
+  const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : null;
 
   if (!token) return res.status(401).json({ message: "No token" });
 

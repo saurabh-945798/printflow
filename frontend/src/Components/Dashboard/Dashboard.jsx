@@ -129,7 +129,6 @@ const Dashboard = () => {
 
     const loadOrders = async () => {
       if (token) {
-
         try {
           const res = await fetch(apiUrl("/api/orders"), {
             headers: { Authorization: `Bearer ${token}` },

@@ -18,6 +18,7 @@ export const addCartItem = async (req, res) => {
     const user = await User.findById(req.user.userId);
     if (!user) return res.status(404).json({ message: "User not found" });
 
+    // Guarantee an array target before adding the newest item.
     if (!Array.isArray(user.cartItems)) user.cartItems = [];
     user.cartItems.unshift(item);
     await user.save();

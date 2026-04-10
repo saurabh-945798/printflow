@@ -26,11 +26,13 @@ const userSchema = new mongoose.Schema(
     },
 
     cartItems: {
+      // Mixed payload keeps customize variants flexible without schema migration churn.
       type: [mongoose.Schema.Types.Mixed],
       default: [],
     },
 
     orders: {
+      // Mixed payload stores checkout snapshot as created by current frontend flow.
       type: [mongoose.Schema.Types.Mixed],
       default: [],
     },

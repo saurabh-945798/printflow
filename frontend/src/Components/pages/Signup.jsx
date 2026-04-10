@@ -24,6 +24,7 @@ const Signup = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  // Skip signup screen when a valid session is already loaded.
   useEffect(() => {
     if (!authLoading && user) {
       navigate("/dashboard", { replace: true });

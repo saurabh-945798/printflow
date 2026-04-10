@@ -8,6 +8,7 @@ const ProtectedRoute = ({ children, role }) => {
 
   if (!user) return <Navigate to="/login" replace />;
 
+  // Redirect authenticated users without required role back to dashboard.
   if (role && user.role !== role)
     return <Navigate to="/dashboard" replace />;
 

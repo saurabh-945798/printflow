@@ -47,6 +47,8 @@ const Orders = ({ isAdmin = false }) => {
           // fall back to local
         }
       }
+
+      // Use last known local snapshot when remote data is unavailable.
       try {
         const raw = localStorage.getItem(ORDERS_KEY);
         const list = raw ? JSON.parse(raw) : [];

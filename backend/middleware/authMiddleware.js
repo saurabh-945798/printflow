@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 
 export const requireAuth = (req, res, next) => {
   const authHeader = req.headers.authorization || "";
+  // Accept only Bearer token format from Authorization header.
   const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : null;
 
   if (!token) return res.status(401).json({ message: "No token" });

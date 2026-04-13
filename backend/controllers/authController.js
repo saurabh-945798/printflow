@@ -17,6 +17,7 @@ const serializeUser = (user) => ({
 export const register = async (req, res) => {
   try {
     const { name, email, password } = req.body;
+    // Normalize user input so lookup and persistence stay consistent.
     const normalizedEmail = email?.trim().toLowerCase();
     const trimmedName = name?.trim();
 
@@ -56,6 +57,7 @@ export const register = async (req, res) => {
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
+    // Use the same normalization strategy as registration before lookup.
     const normalizedEmail = email?.trim().toLowerCase();
 
     if (!normalizedEmail || !password) {

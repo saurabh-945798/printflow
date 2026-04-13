@@ -15,6 +15,7 @@ export const AuthProvider = ({ children }) => {
     const savedToken = localStorage.getItem(TOKEN_KEY);
     const savedUser = localStorage.getItem(USER_KEY);
 
+    // Restore only when both token and user payload are present and parseable.
     if (savedToken && savedUser && savedUser !== "undefined") {
       try {
         setToken(savedToken);

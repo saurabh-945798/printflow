@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext.jsx";
+import { apiUrl } from "../../lib/api.js";
 
 const ORDERS_KEY = "printflow_orders_v1";
 
@@ -32,7 +33,7 @@ const Orders = ({ isAdmin = false }) => {
     const load = async () => {
       if (token) {
         try {
-          const res = await fetch("http://localhost:5000/api/orders", {
+          const res = await fetch(apiUrl("/api/orders"), {
             headers: { Authorization: `Bearer ${token}` },
           });
           if (res.ok) {

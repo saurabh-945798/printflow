@@ -1,7 +1,7 @@
 import Customize from "./Customize.jsx";
 
 const CustomizePoster = () => {
-  return <Customize categoryOverride="poster" />;
+  return <Customize categoryOverride="cup" />;
 };
 
 export default CustomizePoster;

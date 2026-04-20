@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "../../context/AuthContext.jsx";
+import { apiUrl } from "../../lib/api.js";
 
 /* ---------------- STORAGE KEYS (same system) ---------------- */
 const CART_KEY = "printflow_cart_v1";
@@ -45,39 +46,26 @@ function makeId() {
 
 /* ---------------- CATEGORY CONFIG ----------------
    - "visiting-card" uses TEMPLATE EDITOR
-   - "flex/poster" uses SIZE EDITOR (simple)
+   - "cloth" uses TEMPLATE EDITOR
+   - "cup" uses TEMPLATE EDITOR
 ---------------------------------------------------*/
 
 const CATEGORY_CONFIG = {
-  flex: {
-    title: "Flex Printing",
-    desc: "Large outdoor & indoor banner prints",
+  cloth: {
+    title: "Cloth Printing",
+    desc: "Custom apparel, uniforms, hoodies, and fabric branding",
     tag: "Popular",
-    rate: 10,
-    unit: "ft",
-    image:
-      "https://images.unsplash.com/photo-1526481280695-3c687fd643ed?auto=format&fit=crop&w=1200&q=60",
-    presets: [
-      [3, 6],
-      [4, 8],
-      [5, 10],
-    ],
-    mode: "SIZE",
+    rate: 499,
+    unit: "unit",
+    mode: "TEMPLATE",
   },
-  poster: {
-    title: "Poster Printing",
-    desc: "High-quality promotional posters",
+  cup: {
+    title: "Cup Printing",
+    desc: "Printed mugs and cups with names, logos, and gift-ready designs",
     tag: "Trending",
-    rate: 8,
-    unit: "ft",
-    image:
-      "https://images.unsplash.com/photo-1520975958225-40f609bdc64a?auto=format&fit=crop&w=1200&q=60",
-    presets: [
-      [2, 3],
-      [3, 4],
-      [4, 6],
-    ],
-    mode: "SIZE",
+    rate: 299,
+    unit: "unit",
+    mode: "TEMPLATE",
   },
 
   "visiting-card": {
@@ -200,124 +188,105 @@ const VC_TEMPLATES = [
 ];
 
 /* ---------------- POSTER TEMPLATES ---------------- */
-const POSTER_TEMPLATES = [
+const CUP_TEMPLATES = [
   {
-    id: "p1",
-    name: "Event Blast",
-    previewTag: "Bold",
+    id: "cup-classic",
+    name: "Classic Mug",
+    previewTag: "Best seller",
+    productType: "Ceramic Mug",
+    price: 299,
+    previewType: "cup",
     card: {
-      bg: "bg-gradient-to-br from-indigo-600 to-sky-600 text-white",
+      bg: "bg-slate-100",
       ring: "ring-1 ring-black/10",
+      size: { w: 360, h: 320 },
     },
-    deco: [
-      { className: "absolute -top-12 -left-10 h-40 w-40 rounded-full bg-white/15 blur-2xl" },
-      { className: "absolute -bottom-12 -right-10 h-44 w-44 rounded-full bg-white/10 blur-2xl" },
-    ],
+    deco: [],
     fields: [
-      { key: "title", label: "Title", x: 10, y: 16, size: 26, weight: 900 },
-      { key: "subtitle", label: "Subtitle", x: 10, y: 46, size: 14, weight: 600 },
-      { key: "date", label: "Date", x: 10, y: 70, size: 12, weight: 600 },
-      { key: "venue", label: "Venue", x: 10, y: 86, size: 12, weight: 600 },
-      { key: "cta", label: "CTA", x: 10, y: 110, size: 13, weight: 800 },
+      { key: "name", label: "Name", x: 50, y: 42, size: 20, weight: 900, align: "center", width: "64%" },
+      { key: "message", label: "Message", x: 50, y: 58, size: 12, weight: 600, align: "center", width: "70%" },
     ],
-    logo: { x: 76, y: 12, w: 46, h: 46, shape: "rounded-2xl", invert: true },
+    logo: { x: 50, y: 50, w: 76, h: 76, shape: "rounded-2xl" },
   },
   {
-    id: "p2",
-    name: "Clean Promo",
-    previewTag: "Minimal",
+    id: "cup-travel",
+    name: "Travel Cup",
+    previewTag: "Premium",
+    productType: "Travel Cup",
+    price: 449,
+    previewType: "cup",
     card: {
-      bg: "bg-white",
+      bg: "bg-slate-100",
       ring: "ring-1 ring-black/10",
+      size: { w: 360, h: 320 },
     },
-    deco: [
-      { className: "absolute right-0 top-0 h-16 w-28 bg-indigo-600" },
-      { className: "absolute right-0 top-16 h-16 w-28 bg-sky-500" },
-    ],
+    deco: [],
     fields: [
-      { key: "title", label: "Title", x: 10, y: 22, size: 24, weight: 900 },
-      { key: "subtitle", label: "Subtitle", x: 10, y: 48, size: 13, weight: 600, muted: true },
-      { key: "date", label: "Date", x: 10, y: 72, size: 12, weight: 600 },
-      { key: "venue", label: "Venue", x: 10, y: 88, size: 12, weight: 600 },
-      { key: "cta", label: "CTA", x: 10, y: 112, size: 12, weight: 800 },
+      { key: "name", label: "Name", x: 50, y: 40, size: 18, weight: 900, align: "center", width: "66%" },
+      { key: "message", label: "Message", x: 50, y: 56, size: 11, weight: 700, align: "center", width: "72%" },
     ],
-    logo: { x: 72, y: 18, w: 40, h: 40, shape: "rounded-full" },
+    logo: { x: 50, y: 48, w: 70, h: 70, shape: "rounded-3xl" },
+  },
+  {
+    id: "cup-gift",
+    name: "Gift Cup",
+    previewTag: "Festive",
+    productType: "Gift Cup",
+    price: 379,
+    previewType: "cup",
+    card: {
+      bg: "bg-slate-100",
+      ring: "ring-1 ring-black/10",
+      size: { w: 360, h: 320 },
+    },
+    deco: [],
+    fields: [
+      { key: "name", label: "Name", x: 50, y: 40, size: 18, weight: 900, align: "center", width: "64%" },
+      { key: "message", label: "Message", x: 50, y: 56, size: 11, weight: 700, align: "center", width: "72%" },
+    ],
+    logo: { x: 50, y: 48, w: 72, h: 72, shape: "rounded-full" },
   },
 ];
 
 /* ---------------- FLEX TEMPLATES ---------------- */
 const FLEX_TEMPLATES = [
   {
-    id: "f1",
-    name: "Mega Sale",
-    previewTag: "Promo",
+    id: "cloth-tshirt",
+    name: "T-Shirt",
+    previewTag: "Apparel",
+    productType: "T-Shirt",
+    price: 499,
+    previewType: "apparel",
     card: {
-      bg: "bg-gradient-to-r from-slate-950 via-slate-900 to-indigo-900 text-white",
+      bg: "bg-slate-100",
       ring: "ring-1 ring-black/10",
+      size: { w: 360, h: 360 },
     },
-    deco: [
-      { className: "absolute -left-10 -top-10 h-36 w-36 rounded-full bg-indigo-500/20 blur-2xl" },
-      { className: "absolute right-0 bottom-0 h-14 w-44 bg-gradient-to-r from-sky-400 to-indigo-500" },
-      { className: "absolute left-0 top-0 h-8 w-full bg-gradient-to-r from-amber-400 to-amber-500" },
-      { className: "absolute -right-8 -top-8 h-24 w-24 rounded-full bg-white/10 blur-xl" },
-    ],
+    deco: [],
     fields: [
-      { key: "offer", label: "Offer", x: 10, y: 10, size: 12, weight: 900 },
-      { key: "title", label: "Headline", x: 10, y: 28, size: 24, weight: 900 },
-      { key: "subtitle", label: "Subtext", x: 10, y: 56, size: 13, weight: 600, muted: true },
-      { key: "address", label: "Address", x: 10, y: 80, size: 12, weight: 600 },
-      { key: "phone", label: "Phone", x: 10, y: 98, size: 12, weight: 700, mono: true },
-      { key: "time", label: "Timing", x: 10, y: 114, size: 11, weight: 700 },
-      { key: "cta", label: "CTA", x: 10, y: 128, size: 12, weight: 800 },
+      { key: "name", label: "Name", x: 50, y: 62, size: 18, weight: 900, align: "center", width: "55%" },
+      { key: "design", label: "Design Text", x: 50, y: 74, size: 12, weight: 700, align: "center", width: "60%" },
     ],
-    logo: { x: 78, y: 16, w: 42, h: 42, shape: "rounded-2xl", invert: true },
+    logo: { x: 50, y: 45, w: 82, h: 82, shape: "rounded-2xl" },
   },
   {
-    id: "f2",
-    name: "Grand Opening",
-    previewTag: "Launch",
+    id: "cloth-hoodie",
+    name: "Hoodie",
+    previewTag: "Premium",
+    productType: "Hoodie",
+    price: 799,
+    previewType: "apparel",
     card: {
-      bg: "bg-white",
+      bg: "bg-slate-100",
       ring: "ring-1 ring-black/10",
+      size: { w: 360, h: 360 },
     },
-    deco: [
-      { className: "absolute left-0 top-0 h-full w-3 bg-indigo-600" },
-      { className: "absolute right-0 top-0 h-full w-3 bg-sky-500" },
-      { className: "absolute bottom-0 left-0 h-14 w-full bg-slate-900" },
-      { className: "absolute right-8 top-6 h-16 w-16 rounded-full bg-indigo-50" },
-    ],
+    deco: [],
     fields: [
-      { key: "title", label: "Headline", x: 10, y: 22, size: 22, weight: 900 },
-      { key: "subtitle", label: "Subtext", x: 10, y: 48, size: 13, weight: 600, muted: true },
-      { key: "offer", label: "Offer", x: 10, y: 68, size: 12, weight: 800 },
-      { key: "address", label: "Address", x: 10, y: 86, size: 12, weight: 600 },
-      { key: "phone", label: "Phone", x: 10, y: 104, size: 12, weight: 700, mono: true },
-      { key: "time", label: "Timing", x: 10, y: 120, size: 11, weight: 700 },
+      { key: "name", label: "Name", x: 50, y: 60, size: 18, weight: 900, align: "center", width: "55%" },
+      { key: "design", label: "Design Text", x: 50, y: 73, size: 12, weight: 700, align: "center", width: "60%" },
     ],
-    logo: { x: 78, y: 18, w: 42, h: 42, shape: "rounded-full" },
-  },
-  {
-    id: "f3",
-    name: "Festival Night",
-    previewTag: "Seasonal",
-    card: {
-      bg: "bg-gradient-to-br from-amber-500 via-orange-500 to-rose-500 text-white",
-      ring: "ring-1 ring-black/10",
-    },
-    deco: [
-      { className: "absolute -left-10 -top-10 h-36 w-36 rounded-full bg-white/15 blur-2xl" },
-      { className: "absolute right-0 bottom-0 h-14 w-44 bg-black/15" },
-      { className: "absolute left-6 bottom-6 h-10 w-24 rounded-full bg-white/20" },
-    ],
-    fields: [
-      { key: "title", label: "Headline", x: 10, y: 22, size: 22, weight: 900 },
-      { key: "subtitle", label: "Subtext", x: 10, y: 50, size: 13, weight: 600, muted: true },
-      { key: "offer", label: "Offer", x: 10, y: 70, size: 12, weight: 800 },
-      { key: "address", label: "Address", x: 10, y: 88, size: 12, weight: 600 },
-      { key: "phone", label: "Phone", x: 10, y: 106, size: 12, weight: 700, mono: true },
-      { key: "cta", label: "CTA", x: 10, y: 122, size: 12, weight: 800 },
-    ],
-    logo: { x: 78, y: 16, w: 42, h: 42, shape: "rounded-2xl", invert: true },
+    logo: { x: 50, y: 43, w: 82, h: 82, shape: "rounded-2xl" },
   },
 ];
 
@@ -378,8 +347,8 @@ const ID_TEMPLATES = [
 ];
 
 const TEMPLATE_LIBRARY = {
-  flex: FLEX_TEMPLATES,
-  poster: POSTER_TEMPLATES,
+  cloth: FLEX_TEMPLATES,
+  cup: CUP_TEMPLATES,
   "visiting-card": VC_TEMPLATES,
   "id-card": ID_TEMPLATES,
 };
@@ -394,21 +363,20 @@ const DEFAULT_TEMPLATE_VALUES = {
     email: "rahul@printflow.in",
     website: "printflow.in",
   },
-  poster: {
-    title: "Grand Opening Event",
-    subtitle: "Join us for an unforgettable day",
-    date: "20 Sept 2026",
-    venue: "Mathura, UP",
-    cta: "Call 98765 43210",
+  cup: {
+    name: "Aisha",
+    message: "Best gift ever",
+    color: "#f97316",
+    printSide: "front",
+    finish: "glossy",
   },
-  flex: {
-    title: "Mega Sale",
-    subtitle: "Up to 50% Off on Prints",
-    offer: "HURRY! LIMITED TIME",
-    address: "Main Market, Mathura",
-    phone: "+91 98765 43210",
-    time: "10 AM - 9 PM",
-    cta: "WhatsApp to Order",
+  cloth: {
+    name: "Aarav",
+    design: "Team PrintFlow",
+    color: "#1f2937",
+    view: "front",
+    fit: "male",
+    size: "M",
   },
   "id-card": {
     institute: "INSTITUTE NAME",
@@ -473,7 +441,7 @@ const Customize = ({ categoryOverride }) => {
     );
   }
 
-  const config = CATEGORY_CONFIG[category] || CATEGORY_CONFIG.flex;
+  const config = CATEGORY_CONFIG[category] || CATEGORY_CONFIG.cloth;
   const [cartModalOpen, setCartModalOpen] = useState(false);
   const [lastAddedItem, setLastAddedItem] = useState(null);
 
@@ -535,7 +503,7 @@ const Customize = ({ categoryOverride }) => {
      Unit-based: price = rate * quantity (quantity later in cart)
      For now show base unit cost and "per unit" clarity.
   --------------------------------------------------------------*/
-  const vcUnitPrice = config.rate; // 5 INR per card (demo)
+  const vcUnitPrice = template?.price ?? config.rate;
   const vcSubtotal = vcUnitPrice; // preview for 1 unit
 
   /* ---------------- ACTIONS ---------------- */
@@ -556,7 +524,7 @@ const Customize = ({ categoryOverride }) => {
 
     if (token) {
       try {
-        const res = await fetch("http://localhost:5000/api/cart/add", {
+        const res = await fetch(apiUrl("/api/cart/add"), {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -589,6 +557,9 @@ const Customize = ({ categoryOverride }) => {
       kind: "template",
       templateId,
       values: templateValues,
+      productType: template?.productType || "",
+      finish: templateValues.finish || "",
+      printSide: templateValues.printSide || "",
       logoName: logoFile?.name || "",
       updatedAt: Date.now(),
     };
@@ -602,6 +573,10 @@ const Customize = ({ categoryOverride }) => {
       kind: "template",
       templateId,
       values: templateValues,
+      productType: template?.productType || "",
+      color: templateValues.color || "",
+      finish: templateValues.finish || "",
+      printSide: templateValues.printSide || "",
       logo: logoFile ? { name: logoFile.name } : null,
       quantity: 1,
       rate: vcUnitPrice,
@@ -713,6 +688,34 @@ const Customize = ({ categoryOverride }) => {
             setPhotoFile(null);
             setPhotoUrl("");
           }}
+          showColorPicker={category === "cloth"}
+          showApparelOptions={category === "cloth"}
+          showCupOptions={category === "cup"}
+          selectedColor={templateValues.color || "#1f2937"}
+          onColorChange={(value) =>
+            setTemplateValues((p) => ({ ...p, color: value }))
+          }
+          selectedView={templateValues.view || "front"}
+          onViewChange={(value) =>
+            setTemplateValues((p) => ({ ...p, view: value }))
+          }
+          selectedFit={templateValues.fit || "male"}
+          onFitChange={(value) =>
+            setTemplateValues((p) => ({ ...p, fit: value }))
+          }
+          selectedSize={templateValues.size || "M"}
+          onSizeChange={(value) =>
+            setTemplateValues((p) => ({ ...p, size: value }))
+          }
+          selectedPrintSide={templateValues.printSide || "front"}
+          onPrintSideChange={(value) =>
+            setTemplateValues((p) => ({ ...p, printSide: value }))
+          }
+          selectedFinish={templateValues.finish || "glossy"}
+          onFinishChange={(value) =>
+            setTemplateValues((p) => ({ ...p, finish: value }))
+          }
+          productTypeLabel={template?.productType || ""}
           vcUnitPrice={vcUnitPrice}
           vcSubtotal={vcSubtotal}
           unitLabel={config.unit || "unit"}
@@ -780,6 +783,22 @@ function TemplateEditor({
   onPickPhoto,
   onPhotoChange,
   onRemovePhoto,
+  showColorPicker,
+  showApparelOptions,
+  showCupOptions,
+  selectedColor,
+  onColorChange,
+  selectedView,
+  onViewChange,
+  selectedFit,
+  onFitChange,
+  selectedSize,
+  onSizeChange,
+  selectedPrintSide,
+  onPrintSideChange,
+  selectedFinish,
+  onFinishChange,
+  productTypeLabel,
   vcUnitPrice,
   vcSubtotal,
   unitLabel,
@@ -855,6 +874,11 @@ function TemplateEditor({
             <h2 className="text-lg font-semibold text-slate-900">
               Edit details
             </h2>
+            {productTypeLabel ? (
+              <p className="mt-2 text-xs font-semibold uppercase tracking-[0.18em] text-indigo-600">
+                Product: {productTypeLabel}
+              </p>
+            ) : null}
             <p className="text-sm text-slate-600 mt-1">
               Update fields — preview updates instantly.
             </p>
@@ -873,13 +897,164 @@ function TemplateEditor({
           ))}
         </div>
 
+        {showColorPicker ? (
+          <div className="mt-5 rounded-2xl bg-slate-50 ring-1 ring-black/5 p-4">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <p className="text-sm font-semibold text-slate-900">Garment color</p>
+                <p className="text-xs text-slate-600 mt-1">
+                  Pick the base color for the selected apparel.
+                </p>
+              </div>
+              <div className="flex items-center gap-3 rounded-xl bg-white px-3 py-2 ring-1 ring-black/5">
+                <input
+                  type="color"
+                  value={selectedColor}
+                  onChange={(e) => onColorChange(e.target.value)}
+                  className="h-9 w-9 cursor-pointer border-0 bg-transparent p-0"
+                />
+                <span className="text-xs font-semibold uppercase text-slate-600">
+                  {selectedColor}
+                </span>
+              </div>
+            </div>
+          </div>
+        ) : null}
+
+        {showApparelOptions ? (
+          <div className="mt-5 grid gap-4 rounded-2xl bg-slate-50 p-4 ring-1 ring-black/5">
+            <div>
+              <p className="text-sm font-semibold text-slate-900">View</p>
+              <div className="mt-2 grid grid-cols-2 gap-2">
+                {["front", "back"].map((view) => (
+                  <button
+                    key={view}
+                    type="button"
+                    onClick={() => onViewChange(view)}
+                    className={`rounded-xl px-3 py-2 text-sm font-semibold transition ${
+                      selectedView === view
+                        ? "bg-indigo-600 text-white"
+                        : "bg-white text-slate-700 ring-1 ring-black/5 hover:ring-black/10"
+                    }`}
+                  >
+                    {view === "front" ? "Front" : "Back"}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <p className="text-sm font-semibold text-slate-900">Fit style</p>
+              <div className="mt-2 grid grid-cols-2 gap-2">
+                {["male", "female"].map((fit) => (
+                  <button
+                    key={fit}
+                    type="button"
+                    onClick={() => onFitChange(fit)}
+                    className={`rounded-xl px-3 py-2 text-sm font-semibold capitalize transition ${
+                      selectedFit === fit
+                        ? "bg-indigo-600 text-white"
+                        : "bg-white text-slate-700 ring-1 ring-black/5 hover:ring-black/10"
+                    }`}
+                  >
+                    {fit}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <p className="text-sm font-semibold text-slate-900">Size</p>
+              <div className="mt-2 grid grid-cols-4 gap-2">
+                {["S", "M", "L", "XL"].map((size) => (
+                  <button
+                    key={size}
+                    type="button"
+                    onClick={() => onSizeChange(size)}
+                    className={`rounded-xl px-3 py-2 text-sm font-semibold transition ${
+                      selectedSize === size
+                        ? "bg-slate-950 text-white"
+                        : "bg-white text-slate-700 ring-1 ring-black/5 hover:ring-black/10"
+                    }`}
+                  >
+                    {size}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        ) : null}
+
+        {showCupOptions ? (
+          <div className="mt-5 grid gap-4 rounded-2xl bg-slate-50 p-4 ring-1 ring-black/5">
+            <div>
+              <p className="text-sm font-semibold text-slate-900">Cup color</p>
+              <div className="mt-2 flex items-center gap-3 rounded-xl bg-white px-3 py-2 ring-1 ring-black/5">
+                <input
+                  type="color"
+                  value={selectedColor}
+                  onChange={(e) => onColorChange(e.target.value)}
+                  className="h-9 w-9 cursor-pointer border-0 bg-transparent p-0"
+                />
+                <span className="text-xs font-semibold uppercase text-slate-600">
+                  {selectedColor}
+                </span>
+              </div>
+            </div>
+
+            <div>
+              <p className="text-sm font-semibold text-slate-900">Print side</p>
+              <div className="mt-2 grid grid-cols-3 gap-2">
+                {[
+                  { id: "front", label: "Front" },
+                  { id: "back", label: "Back" },
+                  { id: "wrap", label: "Full Wrap" },
+                ].map((side) => (
+                  <button
+                    key={side.id}
+                    type="button"
+                    onClick={() => onPrintSideChange(side.id)}
+                    className={`rounded-xl px-3 py-2 text-sm font-semibold transition ${
+                      selectedPrintSide === side.id
+                        ? "bg-indigo-600 text-white"
+                        : "bg-white text-slate-700 ring-1 ring-black/5 hover:ring-black/10"
+                    }`}
+                  >
+                    {side.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <p className="text-sm font-semibold text-slate-900">Finish</p>
+              <div className="mt-2 grid grid-cols-2 gap-2">
+                {["glossy", "matte"].map((finish) => (
+                  <button
+                    key={finish}
+                    type="button"
+                    onClick={() => onFinishChange(finish)}
+                    className={`rounded-xl px-3 py-2 text-sm font-semibold capitalize transition ${
+                      selectedFinish === finish
+                        ? "bg-slate-950 text-white"
+                        : "bg-white text-slate-700 ring-1 ring-black/5 hover:ring-black/10"
+                    }`}
+                  >
+                    {finish}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        ) : null}
+
         {/* Logo upload */}
         <div className="mt-5 rounded-2xl bg-slate-50 ring-1 ring-black/5 p-4">
           <div className="flex items-center justify-between gap-3">
             <div>
               <p className="text-sm font-semibold text-slate-900">Logo (optional)</p>
               <p className="text-xs text-slate-600 mt-1">
-                Upload logo for preview (export later).
+                Upload logo or design artwork for preview.
               </p>
             </div>
 
@@ -1021,6 +1196,212 @@ function TemplateEditor({
 function CardCanvas({ template, values, logoUrl, photoUrl }) {
   const W = template.card.size?.w || 360;
   const H = template.card.size?.h || 210;
+
+  if (template.previewType === "cup") {
+    const cupColor = values?.color || "#f97316";
+    const printSide = values?.printSide || "front";
+    const finish = values?.finish || "glossy";
+    const isTravelCup = template.productType === "Travel Cup";
+    const isGiftCup = template.productType === "Gift Cup";
+    const bodyPath = isTravelCup
+      ? "M108 74 C106 56, 194 56, 192 74 L182 286 C180 308, 120 308, 118 286 Z"
+      : "M94 108 C94 84, 206 84, 206 108 L198 258 C196 286, 104 286, 102 258 Z";
+    const handlePath = isTravelCup
+      ? "M190 126 C220 130, 228 194, 194 208"
+      : "M206 126 C238 132, 246 208, 206 216";
+    const wrapX = printSide === "wrap" ? 88 : printSide === "back" ? 126 : 112;
+    const wrapW = printSide === "wrap" ? 124 : 70;
+    const wrapLabel = printSide === "back" ? "Back Print" : printSide === "wrap" ? "Full Wrap" : "Front Print";
+
+    return (
+      <div
+        className={`relative overflow-hidden ${template.card.radius || "rounded-3xl"} ${template.card.bg} ${template.card.ring}`}
+        style={{ width: W, height: H }}
+      >
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.98),rgba(226,232,240,0.75))]" />
+        <div className="absolute inset-0 flex items-center justify-center">
+          <svg viewBox="0 0 320 320" className="h-[270px] w-[270px] drop-shadow-[0_16px_28px_rgba(15,23,42,0.16)]">
+            <defs>
+              <linearGradient id="cupBody" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor={cupColor} />
+                <stop offset="70%" stopColor={cupColor} />
+                <stop offset="100%" stopColor="rgba(15,23,42,0.14)" />
+              </linearGradient>
+              <linearGradient id="cupHighlight" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stopColor="rgba(255,255,255,0.34)" />
+                <stop offset="18%" stopColor="rgba(255,255,255,0.14)" />
+                <stop offset="100%" stopColor="rgba(255,255,255,0)" />
+              </linearGradient>
+              <linearGradient id="cupFinish" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor={finish === "glossy" ? "rgba(255,255,255,0.24)" : "rgba(255,255,255,0.08)"} />
+                <stop offset="100%" stopColor={finish === "glossy" ? "rgba(0,0,0,0.12)" : "rgba(0,0,0,0.18)"} />
+              </linearGradient>
+            </defs>
+
+            {!isTravelCup ? (
+              <>
+                <ellipse cx="150" cy="104" rx="58" ry="18" fill="rgba(255,255,255,0.98)" />
+                <ellipse cx="150" cy="104" rx="44" ry="10" fill="rgba(241,245,249,0.9)" />
+              </>
+            ) : (
+              <>
+                <ellipse cx="150" cy="72" rx="46" ry="14" fill="#111827" />
+                <rect x="110" y="62" width="80" height="26" rx="12" fill="#0f172a" />
+                <rect x="172" y="68" width="16" height="8" rx="4" fill="#374151" />
+              </>
+            )}
+
+            <path d={bodyPath} fill="url(#cupBody)" />
+            <path d={bodyPath} fill="url(#cupFinish)" />
+            <path d={bodyPath} fill="url(#cupHighlight)" />
+            <path d={handlePath} fill="none" stroke={cupColor} strokeWidth={isTravelCup ? "16" : "18"} strokeLinecap="round" />
+            <path d={handlePath} fill="none" stroke="rgba(255,255,255,0.26)" strokeWidth="5" strokeLinecap="round" />
+
+            {isGiftCup ? (
+              <path d="M100 102 C126 78, 174 78, 200 102" fill="none" stroke="rgba(255,255,255,0.52)" strokeWidth="6" strokeLinecap="round" />
+            ) : null}
+
+            <rect x={wrapX} y={126} width={wrapW} height={84} rx="22" fill="rgba(255,255,255,0.94)" stroke="rgba(15,23,42,0.08)" />
+            {logoUrl ? (
+              <image href={logoUrl} x={wrapX} y={126} width={wrapW} height={84} preserveAspectRatio="xMidYMid slice" />
+            ) : (
+              <text x={wrapX + wrapW / 2} y="170" textAnchor="middle" fontSize="11" fontWeight="700" fill="#64748b">
+                ARTWORK
+              </text>
+            )}
+
+            <text x="150" y="228" textAnchor="middle" fontSize="16" fontWeight="900" fill="rgba(255,255,255,0.96)">
+              {values?.name || "Aisha"}
+            </text>
+            <text x="150" y="246" textAnchor="middle" fontSize="10" fontWeight="700" fill="rgba(255,255,255,0.86)">
+              {values?.message || "Best gift ever"}
+            </text>
+            <text x="150" y="264" textAnchor="middle" fontSize="9" fontWeight="700" letterSpacing="1.1" fill="rgba(15,23,42,0.55)">
+              {wrapLabel.toUpperCase()} • {finish.toUpperCase()}
+            </text>
+          </svg>
+        </div>
+      </div>
+    );
+  }
+
+  if (template.previewType === "apparel") {
+    const apparelColor = values?.color || "#1f2937";
+    const isHoodie = template.productType === "Hoodie";
+    const isBackView = values?.view === "back";
+    const isFemaleFit = values?.fit === "female";
+    const sizeScale =
+      values?.size === "S" ? 0.93 : values?.size === "L" ? 1.05 : values?.size === "XL" ? 1.11 : 1;
+    const svgScale = `${sizeScale}`;
+    const chestY = isBackView ? 162 : 150;
+    const shirtPath = isFemaleFit
+      ? "M118 76 C132 56, 168 56, 182 76 L214 92 C230 100, 238 118, 234 136 L218 128 L208 160 L198 296 C196 320, 180 338, 150 338 C120 338, 104 320, 102 296 L92 160 L82 128 L66 136 C62 118, 70 100, 86 92 Z"
+      : "M104 74 C122 50, 178 50, 196 74 L234 94 C252 104, 260 124, 254 144 L236 136 L220 170 L210 304 C208 326, 192 344, 150 344 C108 344, 92 326, 90 304 L80 170 L64 136 L46 144 C40 124, 48 104, 66 94 Z";
+    const hoodiePath = isFemaleFit
+      ? "M112 86 C124 60, 176 60, 188 86 L214 100 C236 112, 248 134, 246 156 L230 150 L220 182 L212 306 C210 330, 192 346, 150 346 C108 346, 90 330, 88 306 L80 182 L70 150 L54 156 C52 134, 64 112, 86 100 Z"
+      : "M98 86 C114 56, 186 56, 202 86 L234 102 C258 116, 270 140, 268 164 L248 158 L236 192 L226 312 C224 334, 206 350, 150 350 C94 350, 76 334, 74 312 L64 192 L52 158 L32 164 C30 140, 42 116, 66 102 Z";
+    const hoodPath = isFemaleFit
+      ? "M108 64 C118 28, 182 28, 192 64 L180 116 C170 132, 130 132, 120 116 Z"
+      : "M98 62 C110 20, 190 20, 202 62 L186 122 C174 138, 126 138, 114 122 Z";
+    const pocketPath = isFemaleFit
+      ? "M110 236 C118 224, 182 224, 190 236 L178 274 C170 286, 130 286, 122 274 Z"
+      : "M96 236 C106 220, 194 220, 204 236 L190 280 C180 294, 120 294, 110 280 Z";
+    const neckPath = isFemaleFit
+      ? "M124 74 C134 92, 166 92, 176 74"
+      : "M116 72 C128 94, 172 94, 184 72";
+    const backNeckPath = isFemaleFit
+      ? "M120 82 C132 92, 168 92, 180 82"
+      : "M112 80 C126 92, 174 92, 188 80";
+    const designFrame = isBackView
+      ? { x: 108, y: 134, w: 84, h: 84 }
+      : { x: 116, y: 136, w: 68, h: 68 };
+    const labelY = isBackView ? 238 : 222;
+
+    return (
+      <div
+        className={`relative overflow-hidden ${template.card.radius || "rounded-3xl"} ${template.card.bg} ${template.card.ring}`}
+        style={{ width: W, height: H }}
+      >
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.98),rgba(226,232,240,0.7))]" />
+        <div className="absolute inset-0 flex items-center justify-center">
+          <svg viewBox="0 0 300 390" className="h-[320px] w-[246px] drop-shadow-[0_18px_30px_rgba(15,23,42,0.18)]">
+            <defs>
+              <linearGradient id="fabricShade" x1="0" x2="1">
+                <stop offset="0%" stopColor="rgba(255,255,255,0.16)" />
+                <stop offset="45%" stopColor="rgba(255,255,255,0.02)" />
+                <stop offset="100%" stopColor="rgba(0,0,0,0.14)" />
+              </linearGradient>
+              <linearGradient id="fabricVertical" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="rgba(255,255,255,0.18)" />
+                <stop offset="55%" stopColor="rgba(255,255,255,0.03)" />
+                <stop offset="100%" stopColor="rgba(0,0,0,0.12)" />
+              </linearGradient>
+              <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+                <feDropShadow dx="0" dy="10" stdDeviation="10" floodColor="rgba(15,23,42,0.16)" />
+              </filter>
+            </defs>
+
+            <g transform={`translate(150 18) scale(${svgScale}) translate(-150 0)`} filter="url(#softShadow)">
+              {isHoodie ? (
+                <>
+                  <path d={hoodPath} fill={apparelColor} />
+                  <path d={hoodPath} fill="url(#fabricShade)" opacity="0.7" />
+                  <path d={hoodiePath} fill={apparelColor} />
+                  <path d={hoodiePath} fill="url(#fabricVertical)" />
+                  <path d={backNeckPath} fill="none" stroke="rgba(255,255,255,0.45)" strokeWidth="5" strokeLinecap="round" />
+                  {!isBackView ? <path d={pocketPath} fill="rgba(0,0,0,0.1)" stroke="rgba(255,255,255,0.18)" strokeWidth="2" /> : null}
+                  {!isBackView ? (
+                    <>
+                      <line x1="126" y1="102" x2="120" y2="154" stroke="rgba(255,255,255,0.65)" strokeWidth="3" strokeLinecap="round" />
+                      <line x1="174" y1="102" x2="180" y2="154" stroke="rgba(255,255,255,0.65)" strokeWidth="3" strokeLinecap="round" />
+                      <circle cx="126" cy="100" r="4" fill="rgba(255,255,255,0.92)" />
+                      <circle cx="174" cy="100" r="4" fill="rgba(255,255,255,0.92)" />
+                    </>
+                  ) : null}
+                </>
+              ) : (
+                <>
+                  <path d={shirtPath} fill={apparelColor} />
+                  <path d={shirtPath} fill="url(#fabricVertical)" />
+                  <path d={isBackView ? backNeckPath : neckPath} fill="none" stroke="rgba(255,255,255,0.5)" strokeWidth="6" strokeLinecap="round" />
+                  {!isBackView ? (
+                    <>
+                      <path d="M90 120 C106 108, 120 110, 128 126" fill="none" stroke="rgba(0,0,0,0.06)" strokeWidth="8" strokeLinecap="round" />
+                      <path d="M210 120 C194 108, 180 110, 172 126" fill="none" stroke="rgba(0,0,0,0.06)" strokeWidth="8" strokeLinecap="round" />
+                    </>
+                  ) : null}
+                </>
+              )}
+
+              <rect x={designFrame.x} y={designFrame.y} width={designFrame.w} height={designFrame.h} rx={isBackView ? 28 : 20} fill="rgba(255,255,255,0.94)" stroke="rgba(15,23,42,0.08)" />
+              {logoUrl ? (
+                <image href={logoUrl} x={designFrame.x} y={designFrame.y} width={designFrame.w} height={designFrame.h} preserveAspectRatio="xMidYMid slice" clipPath="" />
+              ) : (
+                <text x="150" y={designFrame.y + designFrame.h / 2 + 4} textAnchor="middle" fontSize="12" fontWeight="700" fill="#64748b">
+                  {isBackView ? "ARTWORK" : "DESIGN"}
+                </text>
+              )}
+
+              {!isBackView ? (
+                <>
+                  <text x="150" y={labelY} textAnchor="middle" fontSize="14" fontWeight="900" fill="rgba(255,255,255,0.96)" letterSpacing="0.8">
+                    {values?.name || "YOUR NAME"}
+                  </text>
+                  <text x="150" y={labelY + 18} textAnchor="middle" fontSize="10" fontWeight="700" fill="rgba(255,255,255,0.82)" letterSpacing="0.6">
+                    {values?.design || "Design text"}
+                  </text>
+                </>
+              ) : (
+                <text x="150" y={labelY + 6} textAnchor="middle" fontSize="11" fontWeight="800" fill="rgba(255,255,255,0.88)" letterSpacing="1.2">
+                  {values?.design || "BACK PRINT"}
+                </text>
+              )}
+            </g>
+          </svg>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div

@@ -2,19 +2,20 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext.jsx";
+import { apiUrl } from "../../lib/api.js";
 
 const CART_KEY = "printflow_cart_v1";
 const ORDERS_KEY = "printflow_orders_v1";
 
 const CATEGORY_META = {
-  flex: {
-    label: "Flex Printing",
-    rate: 10,
-    unit: "sq ft",
+  cloth: {
+    label: "Cloth Printing",
+    rate: 499,
+    unit: "unit",
   },
-  poster: {
-    label: "Poster Printing",
-    rate: 8,
+  cup: {
+    label: "Cup Printing",
+    rate: 299,
     unit: "unit",
   },
   "visiting-card": {
@@ -81,7 +82,7 @@ const Cart = () => {
     if (!token) return;
     const loadServerCart = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/cart", {
+        const res = await fetch(apiUrl("/api/cart"), {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (!res.ok) return;
@@ -99,7 +100,7 @@ const Cart = () => {
   const syncCartToServer = async (nextItems) => {
     if (!token) return;
     try {
-      await fetch("http://localhost:5000/api/cart", {
+      await fetch(apiUrl("/api/cart"), {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -144,7 +145,7 @@ const Cart = () => {
 
     if (token) {
       try {
-        const res = await fetch("http://localhost:5000/api/orders", {
+        const res = await fetch(apiUrl("/api/orders"), {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -282,11 +283,28 @@ const Cart = () => {
                   <div>
                     <h3 className="font-semibold">{meta.label}</h3>
                     <p className="text-sm text-slate-600">
-                      {it.kind === "area"
+                      {it.category === "cloth" && it.kind === "template"
+                        ? `${it.productType || "Apparel"} • ${it.color || "Custom color"}`
+                        : it.kind === "area"
                         ? `${it.length} × ${it.width} ${meta.unit}`
                         : "Unit based"}
                     </p>
+                    {it.category === "cloth" && it.kind === "template" ? (
+                      <p className="mt-1 text-xs text-slate-500">
+                        Name: {it.values?.name || "N/A"} • Design: {it.values?.design || "N/A"}
+                      </p>
+                    ) : null}
                   </div>
+                    {it.category === "cloth" && it.kind === "template" ? (
+                      <p className="mt-1 text-xs text-slate-500">
+                        View: {it.values?.view || "front"} â€¢ Fit: {it.values?.fit || "male"} â€¢ Size: {it.values?.size || "M"}
+                      </p>
+                    ) : null}
+                  {it.category === "cup" && it.kind === "template" ? (
+                    <p className="mt-1 text-xs text-slate-500">
+                      Name: {it.values?.name || "N/A"} • Message: {it.values?.message || "N/A"} • {it.finish || "glossy"} • {it.printSide || "front"}
+                    </p>
+                  ) : null}
                   <button
                     onClick={() => handleRemove(it.id)}
                     className="text-sm text-rose-600"

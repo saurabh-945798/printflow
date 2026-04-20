@@ -1,232 +1,114 @@
-// import { Routes, Route, Navigate } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 
-// /* ---------- Public Pages ---------- */
-// import Login from "./Components/pages/Login.jsx";
-// import Signup from "./Components/pages/Signup.jsx";
-
-// /* ---------- Protected Pages ---------- */
-// import Dashboard from "./Components/Dashboard/Dashboard.jsx";
-// import Customize from "./Components/Customize/Customize.jsx";
-// import CustomizeFlex from "./Components/Customize/CustomizeFlex.jsx";
-// import CustomizePoster from "./Components/Customize/CustomizePoster.jsx";
-// import CustomizeVisitingCard from "./Components/Customize/CustomizeVisitingCard.jsx";
-// import CustomizeIdCard from "./Components/Customize/CustomizeIdCard.jsx";
-// import Cart from "./Components/Cart/Cart.jsx";
-// import Orders from "./Components/Orders/Orders.jsx";
-
-// /* ---------- Auth & Layout ---------- */
-// import ProtectedRoute from "./Components/ProtectedRoute";
-// import AppLayout from "./Components/layout/AppLayout";
-
-// function App() {
-//   return (
-//     <Routes>
-//       {/* ================= PUBLIC ROUTES ================= */}
-//       <Route path="/login" element={<Login />} />
-//       <Route path="/signup" element={<Signup />} />
-
-//       {/* ================= PROTECTED ROUTES ================= */}
-
-//       {/* Dashboard */}
-//       <Route
-//         path="/dashboard"
-//         element={
-//           <ProtectedRoute>
-//             <AppLayout>
-//               <Dashboard />
-//             </AppLayout>
-//           </ProtectedRoute>
-//         }
-//       />
-
-//       {/* Customization Studio */}
-//       <Route
-//         path="/customize"
-//         element={
-//           <ProtectedRoute>
-//             <AppLayout>
-//               <Customize />
-//             </AppLayout>
-//           </ProtectedRoute>
-//         }
-//       />
-//       <Route
-//         path="/customize/flex"
-//         element={
-//           <ProtectedRoute>
-//             <AppLayout>
-//               <CustomizeFlex />
-//             </AppLayout>
-//           </ProtectedRoute>
-//         }
-//       />
-//       <Route
-//         path="/customize/poster"
-//         element={
-//           <ProtectedRoute>
-//             <AppLayout>
-//               <CustomizePoster />
-//             </AppLayout>
-//           </ProtectedRoute>
-//         }
-//       />
-//       <Route
-//         path="/customize/visiting-card"
-//         element={
-//           <ProtectedRoute>
-//             <AppLayout>
-//               <CustomizeVisitingCard />
-//             </AppLayout>
-//           </ProtectedRoute>
-//         }
-//       />
-//       <Route
-//         path="/customize/id-card"
-//         element={
-//           <ProtectedRoute>
-//             <AppLayout>
-//               <CustomizeIdCard />
-//             </AppLayout>
-//           </ProtectedRoute>
-//         }
-//       />
-
-//       {/* Cart */}
-//       <Route
-//         path="/cart"
-//         element={
-//           <ProtectedRoute>
-//             <AppLayout>
-//               <Cart />
-//             </AppLayout>
-//           </ProtectedRoute>
-//         }
-//       />
-
-//       {/* Orders */}
-//       <Route
-//         path="/orders"
-//         element={
-//           <ProtectedRoute>
-//             <AppLayout>
-//               <Orders />
-//             </AppLayout>
-//           </ProtectedRoute>
-//         }
-//       />
-
-//       {/* ================= FALLBACK ================= */}
-//       <Route path="*" element={<Navigate to="/dashboard" replace />} />
-//     </Routes>
-//   );
-// }
-
-// export default App;
-
-
-
-
-
-import { Routes, Route, Navigate } from "react-router-dom";
-
-/* ---------- Protected Pages ---------- */
-import Dashboard from "./Components/Dashboard/Dashboard.jsx";
+import Cart from "./Components/Cart/Cart.jsx";
 import Customize from "./Components/Customize/Customize.jsx";
 import CustomizeFlex from "./Components/Customize/CustomizeFlex.jsx";
+import CustomizeIdCard from "./Components/Customize/CustomizeIdCard.jsx";
 import CustomizePoster from "./Components/Customize/CustomizePoster.jsx";
 import CustomizeVisitingCard from "./Components/Customize/CustomizeVisitingCard.jsx";
-import CustomizeIdCard from "./Components/Customize/CustomizeIdCard.jsx";
-import Cart from "./Components/Cart/Cart.jsx";
+import Dashboard from "./Components/Dashboard/Dashboard.jsx";
+import AppLayout from "./Components/layout/AppLayout.jsx";
 import Orders from "./Components/Orders/Orders.jsx";
-
-/* ---------- Layout ---------- */
-import AppLayout from "./Components/layout/AppLayout";
+import Login from "./Components/pages/Login.jsx";
+import Signup from "./Components/pages/Signup.jsx";
+import ProtectedRoute from "./Components/ProtectedRoute.jsx";
+import { useAuth } from "./context/AuthContext.jsx";
 
 function App() {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return <div className="min-h-screen grid place-items-center bg-slate-50 text-slate-700">Loading...</div>;
+  }
+
   return (
     <Routes>
-      {/* ================= DASHBOARD (DEFAULT) ================= */}
-      <Route
-        path="/"
-        element={
-          <AppLayout>
-            <Dashboard />
-          </AppLayout>
-        }
-      />
+      <Route path="/login" element={user ? <Navigate to="/dashboard" replace /> : <Login />} />
+      <Route path="/signup" element={user ? <Navigate to="/dashboard" replace /> : <Signup />} />
+
       <Route
         path="/dashboard"
         element={
-          <AppLayout>
-            <Dashboard />
-          </AppLayout>
+          <ProtectedRoute>
+            <AppLayout>
+              <Dashboard />
+            </AppLayout>
+          </ProtectedRoute>
         }
       />
-
-      {/* Customization Studio */}
       <Route
         path="/customize"
         element={
-          <AppLayout>
-            <Customize />
-          </AppLayout>
+          <ProtectedRoute>
+            <AppLayout>
+              <Customize />
+            </AppLayout>
+          </ProtectedRoute>
         }
       />
       <Route
-        path="/customize/flex"
+        path="/customize/cloth"
         element={
-          <AppLayout>
-            <CustomizeFlex />
-          </AppLayout>
+          <ProtectedRoute>
+            <AppLayout>
+              <CustomizeFlex />
+            </AppLayout>
+          </ProtectedRoute>
         }
       />
       <Route
-        path="/customize/poster"
+        path="/customize/cup"
         element={
-          <AppLayout>
-            <CustomizePoster />
-          </AppLayout>
+          <ProtectedRoute>
+            <AppLayout>
+              <CustomizePoster />
+            </AppLayout>
+          </ProtectedRoute>
         }
       />
       <Route
         path="/customize/visiting-card"
         element={
-          <AppLayout>
-            <CustomizeVisitingCard />
-          </AppLayout>
+          <ProtectedRoute>
+            <AppLayout>
+              <CustomizeVisitingCard />
+            </AppLayout>
+          </ProtectedRoute>
         }
       />
       <Route
         path="/customize/id-card"
         element={
-          <AppLayout>
-            <CustomizeIdCard />
-          </AppLayout>
+          <ProtectedRoute>
+            <AppLayout>
+              <CustomizeIdCard />
+            </AppLayout>
+          </ProtectedRoute>
         }
       />
-
-      {/* Cart */}
       <Route
         path="/cart"
         element={
-          <AppLayout>
-            <Cart />
-          </AppLayout>
+          <ProtectedRoute>
+            <AppLayout>
+              <Cart />
+            </AppLayout>
+          </ProtectedRoute>
         }
       />
-
-      {/* Orders */}
       <Route
         path="/orders"
         element={
-          <AppLayout>
-            <Orders />
-          </AppLayout>
+          <ProtectedRoute>
+            <AppLayout>
+              <Orders />
+            </AppLayout>
+          </ProtectedRoute>
         }
       />
 
-      {/* ================= FALLBACK ================= */}
-      <Route path="*" element={<Navigate to="/dashboard" replace />} />
+      <Route path="/" element={<Navigate to={user ? "/dashboard" : "/login"} replace />} />
+      <Route path="*" element={<Navigate to={user ? "/dashboard" : "/login"} replace />} />
     </Routes>
   );
 }

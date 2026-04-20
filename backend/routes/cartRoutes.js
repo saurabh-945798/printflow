@@ -1,0 +1,11 @@
+import express from "express";
+import { requireAuth } from "../middleware/authMiddleware.js";
+import { addCartItem, getCart, setCart } from "../controllers/cartController.js";
+
+const router = express.Router();
+
+router.get("/", requireAuth, getCart);
+router.post("/add", requireAuth, addCartItem);
+router.put("/", requireAuth, setCart);
+
+export default router;

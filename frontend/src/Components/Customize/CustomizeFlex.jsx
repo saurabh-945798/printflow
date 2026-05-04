@@ -1,7 +1,13 @@
 import Customize from "./Customize.jsx";
 
-const CustomizeFlex = () => {
+/**
+
+* CustomizeFlex
+* Handles the customization flow for cloth/flex printing.
+* Utilizes the shared Customize component with a predefined category.
+  */
+  const CustomizeFlex = () => {
   return <Customize categoryOverride="cloth" />;
-};
+  };
 
 export default CustomizeFlex;
